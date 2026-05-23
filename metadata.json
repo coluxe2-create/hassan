@@ -1,0 +1,6 @@
+{
+  "name": "Gestion Clients Compteurs",
+  "description": "Application moderne pour le suivi, l'édition et la recherche rapide des compteurs d'eau, d'électricité et Wi-Fi des clients.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
