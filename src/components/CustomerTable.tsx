@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { Edit, Trash2, Copy, Check, Droplets, Zap, Wifi, User, SearchX, AlertTriangle, Eye, EyeOff } from "lucide-react";
+import { Edit, Trash2, Copy, Check, Droplets, Zap, Wifi, User, SearchX, AlertTriangle } from "lucide-react";
 import { Customer } from "../types";
 
 interface CustomerTableProps {
@@ -17,8 +17,6 @@ interface CustomerTableProps {
 export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: CustomerTableProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [revealedWifiIds, setRevealedWifiIds] = useState<string[]>([]);
-
   // Clipboard copy handler
   const copyToClipboard = (text: string, key: string) => {
     if (!text) return;
@@ -26,13 +24,6 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
       setCopiedKey(key);
       setTimeout(() => setCopiedKey(null), 1800);
     });
-  };
-
-  // Toggle reveal Wi-Fi
-  const toggleWifiReveal = (id: string) => {
-    setRevealedWifiIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
   };
 
   // Helper helper to highlight search matches
@@ -46,7 +37,7 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
       <>
         {parts.map((part, index) =>
           regex.test(part) ? (
-            <mark key={index} className="bg-blue-100 text-blue-900 font-semibold px-0.5 rounded-[2px]">
+            <mark key={index} className="bg-blue-500/30 text-blue-300 font-bold px-0.5 rounded-[2px]">
               {part}
             </mark>
           ) : (
@@ -73,12 +64,12 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
 
   if (customers.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center flex flex-col items-center justify-center min-h-[300px]" id="no-customers-view">
-        <div className="p-4 bg-slate-50 rounded-full border border-slate-100 mb-3">
-          <SearchX className="w-8 h-8 text-slate-400" />
+      <div className="bg-slate-900 rounded-2xl border border-slate-800 p-8 text-center flex flex-col items-center justify-center min-h-[300px]" id="no-customers-view">
+        <div className="p-4 bg-slate-950 rounded-full border border-slate-800 mb-3">
+          <SearchX className="w-8 h-8 text-slate-550" />
         </div>
-        <p className="text-sm font-medium text-slate-700">Aucun abonné trouvé</p>
-        <p className="text-xs text-slate-500 mt-1 max-w-sm">
+        <p className="text-base font-bold text-slate-200">Aucun abonné trouvé</p>
+        <p className="text-sm text-slate-400 mt-1 max-w-sm">
           {searchQuery
             ? "Aucun résultat ne correspond à votre recherche. Essayez un autre nom."
             : "La base de données est vide. Renseignez le formulaire à gauche pour enregistrer un client."}
@@ -88,9 +79,9 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:border-slate-300 transition-colors" id="customer-table-container">
+    <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg hover:border-slate-700 transition-colors" id="customer-table-container">
       {/* Mobile view cards - hidden on md+ screens */}
-      <div className="block md:hidden divide-y divide-slate-100" id="customer-mobile-list">
+      <div className="block md:hidden divide-y divide-slate-800" id="customer-mobile-list">
         {customers.map((customer) => {
           const isWaterAvailable = !!customer.waterMeter;
           const isElecAvailable = !!customer.electricityMeter;
@@ -98,34 +89,33 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
           const wifiKey = `${customer.id}-wifi`;
           const waterKey = `${customer.id}-water`;
           const elecKey = `${customer.id}-elec`;
-          const isWifiVisible = revealedWifiIds.includes(customer.id);
 
           return (
-            <div key={customer.id} id={`mobile-card-${customer.id}`} className="p-4 space-y-3 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+            <div key={customer.id} id={`mobile-card-${customer.id}`} className="p-4.5 space-y-3 bg-slate-900/40 hover:bg-slate-850/30 transition-colors">
               {/* Header inside card */}
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="font-semibold text-slate-900 text-sm">
+                  <h4 className="font-bold text-slate-100 text-base">
                     {highlightText(customer.name, searchQuery)}
                   </h4>
-                  <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                  <p className="text-xs text-slate-400 font-mono mt-0.5">
                     Modifié le {formatDate(customer.updatedAt)}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   {deleteConfirmId === customer.id ? (
-                    <div className="flex items-center gap-1" id={`confirm-actions-mobile-${customer.id}`}>
+                    <div className="flex items-center gap-1.5" id={`confirm-actions-mobile-${customer.id}`}>
                       <button
                         onClick={() => onDelete(customer.id)}
-                        className="p-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-[10px] uppercase font-bold tracking-wider"
+                        className="p-1.5 bg-red-650 text-white rounded-lg hover:bg-red-750 text-xs uppercase font-bold tracking-wider"
                         title="Confirmer la suppression"
                       >
                         OK
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(null)}
-                        className="p-1.5 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-[10px] uppercase font-bold px-2"
+                        className="p-1.5 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-750 text-xs uppercase font-bold px-2"
                       >
                         Annuler
                       </button>
@@ -134,19 +124,19 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
                     <>
                       <button
                         onClick={() => onEdit(customer)}
-                        className="p-1.5 bg-white text-blue-600 border border-blue-105 rounded-lg hover:bg-blue-50 transition-colors"
+                        className="p-2 bg-slate-950 text-blue-400 border border-slate-850 rounded-lg hover:bg-slate-900 transition-colors"
                         title="Modifier le client"
                         id={`btn-edit-mobile-${customer.id}`}
                       >
-                        <Edit className="w-3.5 h-3.5" />
+                        <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(customer.id)}
-                        className="p-1.5 bg-white text-red-500 border border-red-105 rounded-lg hover:bg-red-50 transition-colors"
+                        className="p-2 bg-slate-950 text-red-400 border border-slate-850 rounded-lg hover:bg-slate-900 transition-colors"
                         title="Supprimer le client"
                         id={`btn-delete-mobile-${customer.id}`}
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </>
                   )}
@@ -154,85 +144,78 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
               </div>
 
               {/* Badges and data block */}
-              <div className="grid grid-cols-1 gap-2 pt-1">
+              <div className="grid grid-cols-1 gap-2.5 pt-1">
                 {/* Water meter info row */}
-                <div className="flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-slate-100">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Droplets className="w-3.5 h-3.5 text-cyan-500" />
+                <div className="flex items-center justify-between text-sm bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <Droplets className="w-4 h-4 text-cyan-400" />
                     <span>Eau:</span>
                   </div>
                   {isWaterAvailable ? (
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-xs font-semibold text-slate-900 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                      <span className="font-mono text-sm font-bold text-slate-200 bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-lg">
                         {customer.waterMeter}
                       </span>
                       <button
                         onClick={() => copyToClipboard(customer.waterMeter, waterKey)}
-                        className="p-1 text-slate-500 hover:text-blue-600 transition-colors"
+                        className="p-1 text-slate-400 hover:text-blue-400 transition-colors"
                         title="Copier"
                       >
-                        {copiedKey === waterKey ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedKey === waterKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[11px] text-slate-400 italic">Non configuré</span>
+                    <span className="text-xs text-slate-500 italic">Non configuré</span>
                   )}
                 </div>
 
                 {/* Elec meter info row */}
-                <div className="flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-slate-100">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Zap className="w-3.5 h-3.5 text-amber-500" />
+                <div className="flex items-center justify-between text-sm bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <Zap className="w-4 h-4 text-amber-400" />
                     <span>Électricité:</span>
                   </div>
                   {isElecAvailable ? (
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-xs font-semibold text-slate-900 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                      <span className="font-mono text-sm font-bold text-slate-200 bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-lg">
                         {customer.electricityMeter}
                       </span>
                       <button
                         onClick={() => copyToClipboard(customer.electricityMeter, elecKey)}
-                        className="p-1 text-slate-500 hover:text-blue-600 transition-colors"
+                        className="p-1 text-slate-400 hover:text-blue-400 transition-colors"
                         title="Copier"
                       >
-                        {copiedKey === elecKey ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedKey === elecKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[11px] text-slate-400 italic">Non configuré</span>
+                    <span className="text-xs text-slate-500 italic">Non configuré</span>
                   )}
                 </div>
 
                 {/* Wifi info row */}
-                <div className="flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-slate-100">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Wifi className="w-3.5 h-3.5 text-indigo-500" />
+                <div className="flex items-center justify-between text-sm bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <Wifi className="w-4 h-4 text-indigo-400" />
                     <span>Wi-Fi:</span>
                   </div>
                   {isWifiAvailable ? (
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-xs font-semibold text-slate-900 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
-                        {isWifiVisible ? customer.wifiCode : "••••••••••"}
+                      <span className="font-mono text-sm font-bold text-slate-200 bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-lg">
+                        {customer.wifiCode}
                       </span>
-                      <div className="flex items-center gap-0.5">
-                        <button
-                          onClick={() => toggleWifiReveal(customer.id)}
-                          className="p-1 text-slate-500 hover:text-blue-600 transition-colors"
-                          title={isWifiVisible ? "Masquer la clé" : "Régler la clé"}
-                        >
-                          {isWifiVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        </button>
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => copyToClipboard(customer.wifiCode, wifiKey)}
-                          className="p-1 text-slate-500 hover:text-blue-600 transition-colors"
+                          className="p-1 text-slate-400 hover:text-blue-400 transition-colors"
                           title="Copier"
                         >
-                          {copiedKey === wifiKey ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                          {copiedKey === wifiKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <span className="text-[11px] text-slate-400 italic">Non configuré</span>
+                    <span className="text-xs text-slate-500 italic">Non configuré</span>
                   )}
                 </div>
               </div>
@@ -245,49 +228,48 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
       <div className="hidden md:block overflow-x-auto" id="customer-desktop-table">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">Client</th>
-              <th className="px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">
+            <tr className="bg-slate-950 border-b border-slate-800">
+              <th className="px-5 py-4 text-sm font-extrabold text-slate-400 uppercase tracking-wider">Client</th>
+              <th className="px-5 py-4 text-sm font-extrabold text-slate-400 uppercase tracking-wider">
                 <div className="flex items-center gap-1.5">
-                  <Droplets className="w-3.5 h-3.5 text-cyan-500" />
+                  <Droplets className="w-4 h-4 text-cyan-400" />
                   Compteur Eau
                 </div>
               </th>
-              <th className="px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <th className="px-5 py-4 text-sm font-extrabold text-slate-400 uppercase tracking-wider">
                 <div className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-amber-500" />
+                  <Zap className="w-4 h-4 text-amber-400" />
                   Compteur Électricité
                 </div>
               </th>
-              <th className="px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <th className="px-5 py-4 text-sm font-extrabold text-slate-400 uppercase tracking-wider">
                 <div className="flex items-center gap-1.5">
-                  <Wifi className="w-3.5 h-3.5 text-indigo-500" />
+                  <Wifi className="w-4 h-4 text-indigo-400" />
                   Réseau & Code Wi-Fi
                 </div>
               </th>
-              <th className="px-5 py-3 text-xs font-bold text-slate-600 uppercase tracking-wider text-right">Actions</th>
+              <th className="px-5 py-4 text-sm font-extrabold text-slate-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-800/80">
             {customers.map((customer) => {
               const wifiKey = `${customer.id}-wifi`;
               const waterKey = `${customer.id}-water`;
               const elecKey = `${customer.id}-elec`;
-              const isWifiVisible = revealedWifiIds.includes(customer.id);
 
               return (
-                <tr key={customer.id} id={`row-customer-${customer.id}`} className="hover:bg-slate-50/70 transition-colors align-middle">
+                <tr key={customer.id} id={`row-customer-${customer.id}`} className="hover:bg-slate-850/40 border-b border-slate-800/60 transition-colors align-middle text-slate-200">
                   {/* Name field */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-                        <User className="w-4 h-4 text-slate-500" id={`user-avatar-icon-${customer.id}`} />
+                      <div className="w-9 h-9 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center shrink-0">
+                        <User className="w-4.5 h-4.5 text-slate-400" id={`user-avatar-icon-${customer.id}`} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-900 leading-normal">
+                        <p className="text-base font-bold text-slate-100 leading-normal">
                           {highlightText(customer.name, searchQuery)}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-medium">
+                        <p className="text-xs text-slate-400 font-medium">
                           Modifié le {formatDate(customer.updatedAt)}
                         </p>
                       </div>
@@ -298,20 +280,20 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
                   <td className="px-5 py-4">
                     {customer.waterMeter ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md">
+                        <span className="font-mono text-sm font-bold text-slate-200 bg-slate-950/80 border border-slate-800 px-2.5 py-1.5 rounded-xl">
                           {customer.waterMeter}
                         </span>
                         <button
                           onClick={() => copyToClipboard(customer.waterMeter, waterKey)}
-                          className="p-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
+                          className="p-1 px-1.5 text-slate-450 hover:text-blue-400 transition-colors cursor-pointer"
                           title="Copier le compteur d'eau"
                           id={`btn-copy-water-${customer.id}`}
                         >
-                          {copiedKey === waterKey ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                          {copiedKey === waterKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     ) : (
-                      <span className="text-[11px] text-slate-400 italic">Non spécifié</span>
+                      <span className="text-xs text-slate-500 italic">Non spécifié</span>
                     )}
                   </td>
 
@@ -319,20 +301,20 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
                   <td className="px-5 py-4">
                     {customer.electricityMeter ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md">
+                        <span className="font-mono text-sm font-bold text-slate-200 bg-slate-950/80 border border-slate-800 px-2.5 py-1.5 rounded-xl">
                           {customer.electricityMeter}
                         </span>
                         <button
                           onClick={() => copyToClipboard(customer.electricityMeter, elecKey)}
-                          className="p-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
+                          className="p-1 px-1.5 text-slate-450 hover:text-blue-400 transition-colors cursor-pointer"
                           title="Copier le compteur d'électricité"
                           id={`btn-copy-elec-${customer.id}`}
                         >
-                          {copiedKey === elecKey ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                          {copiedKey === elecKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     ) : (
-                      <span className="text-[11px] text-slate-400 italic">Non spécifié</span>
+                      <span className="text-xs text-slate-500 italic">Non spécifié</span>
                     )}
                   </td>
 
@@ -340,30 +322,22 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
                   <td className="px-5 py-4">
                     {customer.wifiCode ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md">
-                          {isWifiVisible ? customer.wifiCode : "••••••••••"}
+                        <span className="font-mono text-sm font-bold text-slate-200 bg-slate-950/80 border border-slate-800 px-2.5 py-1.5 rounded-xl">
+                          {customer.wifiCode}
                         </span>
-                        <div className="flex items-center">
-                          <button
-                            onClick={() => toggleWifiReveal(customer.id)}
-                            className="p-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
-                            id={`btn-toggle-wifi-reveal-${customer.id}`}
-                            title={isWifiVisible ? "Masquer" : "Régler / Afficher"}
-                          >
-                            {isWifiVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                          </button>
+                        <div className="flex items-center gap-0.5">
                           <button
                             onClick={() => copyToClipboard(customer.wifiCode, wifiKey)}
-                            className="p-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
+                            className="p-1 text-slate-450 hover:text-blue-400 transition-colors cursor-pointer"
                             title="Copier le mot de passe Wi-Fi"
                             id={`btn-copy-wifi-${customer.id}`}
                           >
-                            {copiedKey === wifiKey ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copiedKey === wifiKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <span className="text-[11px] text-slate-400 italic">Non configuré</span>
+                      <span className="text-xs text-slate-500 italic">Non configuré</span>
                     )}
                   </td>
 
@@ -371,22 +345,22 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
                   <td className="px-5 py-4 text-right">
                     {deleteConfirmId === customer.id ? (
                       <div className="flex items-center justify-end gap-1.5" id={`confirm-actions-row-${customer.id}`}>
-                        <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
-                          <AlertTriangle className="w-3 h-3" /> Sûr ?
+                        <span className="text-xs text-red-400 font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse">
+                          <AlertTriangle className="w-3.5 h-3.5" /> Sûr ?
                         </span>
                         <button
                           onClick={() => {
                             onDelete(customer.id);
                             setDeleteConfirmId(null);
                           }}
-                          className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-md text-[10px] uppercase font-bold tracking-wider transition-colors cursor-pointer shadow-2xs"
+                          className="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs uppercase font-bold tracking-wider transition-colors cursor-pointer shadow-sm"
                           id={`btn-confirm-delete-row-${customer.id}`}
                         >
                           Oui
                         </button>
                         <button
                           onClick={() => setDeleteConfirmId(null)}
-                          className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-md text-[10px] uppercase font-bold tracking-wider transition-colors cursor-pointer"
+                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-755 text-slate-200 rounded-lg text-xs uppercase font-bold tracking-wider transition-colors cursor-pointer"
                           id={`btn-cancel-delete-row-${customer.id}`}
                         >
                           Non
@@ -396,7 +370,7 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
                       <div className="flex items-center justify-end gap-1.5" id={`default-row-actions-${customer.id}`}>
                         <button
                           onClick={() => onEdit(customer)}
-                          className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50/50 rounded-lg border border-slate-150 transition-colors cursor-pointer"
+                          className="p-2 text-blue-400 hover:text-blue-300 hover:bg-slate-800 rounded-xl border border-slate-800 transition-colors cursor-pointer"
                           title="Modifier l'abonné"
                           id={`btn-edit-row-${customer.id}`}
                         >
@@ -404,7 +378,7 @@ export function CustomerTable({ customers, searchQuery, onEdit, onDelete }: Cust
                         </button>
                         <button
                           onClick={() => setDeleteConfirmId(customer.id)}
-                          className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50/50 rounded-lg border border-slate-150 transition-colors cursor-pointer"
+                          className="p-2 text-red-400 hover:text-red-300 hover:bg-slate-800 rounded-xl border border-slate-800 transition-colors cursor-pointer"
                           title="Supprimer définitivement"
                           id={`btn-delete-row-${customer.id}`}
                         >

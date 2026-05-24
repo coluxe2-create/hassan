@@ -13,12 +13,14 @@ import {
   CloudLightning,
   Terminal,
   Copy,
-  Check
+  Check,
+  LogOut
 } from "lucide-react";
 import { Customer, INITIAL_CUSTOMERS } from "./types";
 import { DashboardStats } from "./components/DashboardStats";
 import { CustomerForm } from "./components/CustomerForm";
 import { CustomerTable } from "./components/CustomerTable";
+import { LoginForm } from "./components/LoginForm";
 import { isSupabaseConfigured } from "./lib/supabaseClient";
 import {
   fetchCustomersFromSupabase,
@@ -32,6 +34,7 @@ export default function App() {
   const isCloudMode = isSupabaseConfigured();
   const [loading, setLoading] = useState(isCloudMode);
   const [supabaseErrorDetail, setSupabaseErrorDetail] = useState<SupabaseErrorDetail | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem("admin_logged_in") === "true");
   
   // Storage source identification
   const [customers, setCustomers] = useState<Customer[]>(() => {
@@ -269,72 +272,100 @@ export default function App() {
     customer.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (!isLoggedIn) {
+    return (
+      <LoginForm
+        onLoginSuccess={() => {
+          setIsLoggedIn(true);
+          localStorage.setItem("admin_logged_in", "true");
+        }}
+      />
+    );
+  }
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem("admin_logged_in");
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans leading-relaxed" id="app-root-layout">
+    <div className="min-h-screen bg-[#070a13] text-slate-200 font-sans leading-relaxed selection:bg-blue-600/30 font-medium" id="app-root-layout">
       {/* Toast alert system */}
       {notification && (
         <div
           id="global-toast-notification"
-          className="fixed top-4 right-4 left-4 sm:left-auto sm:w-96 z-50 p-4 rounded-xl shadow-xl border flex items-start gap-3 transition-all transform animate-[slideIn_0.3s_ease-out] bg-white border-slate-200"
+          className="fixed top-4 right-4 left-4 sm:left-auto sm:w-96 z-50 p-4 rounded-xl shadow-2xl border flex items-start gap-3 transition-all transform animate-[slideIn_0.3s_ease-out] bg-slate-900 border-slate-800"
           style={{ animation: "slideIn 0.3s ease-out forwards" }}
         >
           {notification.type === "success" && (
-            <span className="p-1 bg-emerald-100 rounded-lg text-emerald-600 shrink-0">
+            <span className="p-1 bg-emerald-950/60 rounded-lg text-emerald-400 shrink-0 border border-emerald-900/40">
               <CheckCircle2 className="w-5 h-5" />
             </span>
           )}
           {notification.type === "info" && (
-            <span className="p-1 bg-blue-105 rounded-lg text-blue-600 shrink-0">
+            <span className="p-1 bg-blue-950/60 rounded-lg text-blue-400 shrink-0 border border-blue-900/40">
               <Sparkles className="w-5 h-5" />
             </span>
           )}
           {notification.type === "error" && (
-            <span className="p-1 bg-red-100 rounded-lg text-red-600 shrink-0">
+            <span className="p-1 bg-red-950/60 rounded-lg text-red-400 shrink-0 border border-red-900/40">
               <AlertCircle className="w-5 h-5" />
             </span>
           )}
           <div className="flex-1">
-            <p className="text-xs font-semibold text-slate-900">Notification</p>
-            <p className="text-xs text-slate-600 mt-0.5">{notification.message}</p>
+            <p className="text-xs font-bold text-slate-200">Notification</p>
+            <p className="text-xs text-slate-400 mt-0.5">{notification.message}</p>
           </div>
           <button
             onClick={() => setNotification(null)}
-            className="p-1 hover:bg-slate-100 rounded-md transition-colors"
+            className="p-1 hover:bg-slate-850 rounded-md transition-colors"
           >
-            <X className="w-4 h-4 text-slate-400" />
+            <X className="w-4 h-4 text-slate-450" />
           </button>
         </div>
       )}
 
       {/* Header bar banner */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30" id="main-site-header">
+      <header className="bg-slate-950/80 border-b border-slate-800/80 sticky top-0 z-30 backdrop-blur-md" id="main-site-header">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md shadow-blue-500/20 shrink-0">
-              C
+              S
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-slate-900 tracking-tight">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg font-bold text-slate-100 tracking-tight">
                   Service Clients
                 </h1>
                 
                 {/* Mode badge status */}
                 {isCloudMode ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-950/40 text-emerald-400 border border-emerald-900/40 px-2.5 py-0.5 rounded-full">
                     <CloudLightning className="w-3 h-3 text-emerald-500 animate-pulse" />
                     Supabase Cloud Connecté
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-950/40 text-blue-400 border border-blue-900/40 px-2.5 py-0.5 rounded-full">
                     Mode Local Actif
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 font-medium font-sans">
+              <p className="text-xs text-slate-400 font-medium font-sans mt-0.5">
                 Suivi, édition et recherche des compteurs eau & électricité de clients
               </p>
             </div>
+          </div>
+
+          {/* Action on Header rightside */}
+          <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+            <button
+              onClick={handleLogout}
+              className="px-3.5 py-2 text-xs font-bold bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 hover:text-white rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-md"
+              id="btn-app-logout"
+            >
+              <LogOut className="w-4 h-4 text-red-400" />
+              <span>Se déconnecter</span>
+            </button>
           </div>
         </div>
       </header>
@@ -424,9 +455,9 @@ export default function App() {
                       }
                     });
                   }}
-                  className="px-3 py-1.5 bg-slate-105 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-slate-200"
+                  className="px-3.5 py-2 bg-slate-950 hover:bg-slate-900 text-slate-250 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border border-slate-805"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Réessayer la connexion</span>
                 </button>
               </div>
@@ -436,89 +467,91 @@ export default function App() {
 
         {/* Dynamic loader line */}
         {loading && (
-          <div className="w-full h-1 bg-blue-100 overflow-hidden rounded-full relative" id="table-loading-bar">
-            <div className="absolute inset-y-0 left-0 bg-blue-600 w-1/3 rounded-full animate-[progress_1.4s_infinite_ease-in-out]" style={{ animation: "progress 1.4s infinite ease-in-out" }}></div>
+          <div className="w-full h-1 bg-slate-950 overflow-hidden rounded-full relative" id="table-loading-bar">
+            <div className="absolute inset-y-0 left-0 bg-blue-500 w-1/3 rounded-full animate-[progress_1.4s_infinite_ease-in-out]" style={{ animation: "progress 1.4s infinite ease-in-out" }}></div>
           </div>
         )}
 
-        {/* Searching Filtering tools block */}
-        <section className="bg-white p-4 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4" id="filters-panel">
-          <div className="w-full sm:w-96 relative" id="search-input-field">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-              <Search className="w-4 h-4" />
-            </span>
-            <input
-              type="text"
-              placeholder="Rechercher par nom de client..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-10 py-1.5 text-sm bg-slate-50 rounded-lg border border-slate-200 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
-              id="customer-search-textbox"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 cursor-pointer"
-                id="btn-clear-search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+        {/* Main application UI Layout - Centered form above table */}
+        <section className="space-y-8" id="layout-content-wrapper">
+          {/* Centered Customer registry Form wrapper */}
+          <div className="flex justify-center w-full" id="centered-form-wrapper">
+            <div className="w-full max-w-2xl space-y-4" id="form-inner-container">
+              <CustomerForm
+                currentCustomer={currentCustomer}
+                onSave={handleSaveCustomer}
+                onCancelEdit={() => setCurrentCustomer(null)}
+              />
 
-          <div className="flex items-center justify-between w-full sm:w-auto gap-4 text-xs font-semibold text-slate-500">
-            <span>
-              {searchQuery ? (
-                <>
-                  Abonnés trouvés : <span className="text-slate-900 font-bold">{filteredCustomers.length}</span> sur {customers.length}
-                </>
-              ) : (
-                <>
-                  Total abonnés : <span className="text-slate-900 font-bold">{customers.length}</span>
-                </>
-              )}
-            </span>
-          </div>
-        </section>
-
-        {/* Main application UI Grid splitter */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start" id="split-layout-grid2">
-          {/* Customer registry Form column */}
-          <div className="lg:col-span-1 space-y-4" id="left-form-sidebar">
-            <CustomerForm
-              currentCustomer={currentCustomer}
-              onSave={handleSaveCustomer}
-              onCancelEdit={() => setCurrentCustomer(null)}
-            />
-
-            {/* Offline backup card */}
-            <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 text-xs text-slate-600 space-y-2" id="persistance-disclaimer-panel">
-              <span className="font-bold text-blue-900 uppercase tracking-wide text-[10px] block">
-                {isCloudMode ? "Source Nuage Active (Supabase)" : "Mode Local Activé"}
-              </span>
-              <p className="leading-relaxed">
-                {isCloudMode
-                  ? "Les entrées sont sauvegardées en temps réel sur votre base de données Supabase."
-                  : "Les informations sont actuellement conservées dans la mémoire locale de votre navigateur."}
-              </p>
-              {!isCloudMode && (
-                <div className="pt-2 flex items-center justify-between border-t border-blue-200/30">
-                  <span className="text-[10px] text-slate-500">Données démo d'usine :</span>
-                  <button
-                    type="button"
-                    onClick={handleResetDatabase}
-                    className="text-[10px] font-bold text-red-650 hover:text-red-700 transition-colors uppercase tracking-wider cursor-pointer"
-                    id="btn-hard-reset-data"
-                  >
-                    Restaurer Démo
-                  </button>
-                </div>
-              )}
+              {/* Offline backup card */}
+              <div className="bg-blue-950/10 border border-blue-900/30 rounded-xl p-4.5 text-xs text-slate-300 space-y-2 animate-[fadeIn_0.3s_ease-out]" id="persistance-disclaimer-panel">
+                <span className="font-bold text-blue-400 uppercase tracking-widest text-[11px] block">
+                  {isCloudMode ? "Source Nuage Active (Supabase)" : "Mode Local Activé"}
+                </span>
+                <p className="leading-relaxed text-slate-400">
+                  {isCloudMode
+                    ? "Les entrées sont sauvegardées en temps réel sur votre base de données Supabase."
+                    : "Les informations sont actuellement conservées dans la mémoire locale de votre navigateur."}
+                </p>
+                {!isCloudMode && (
+                  <div className="pt-2 flex items-center justify-between border-t border-slate-800">
+                    <span className="text-[11px] text-slate-500 font-medium">Données démo d'usine :</span>
+                    <button
+                      type="button"
+                      onClick={handleResetDatabase}
+                      className="text-[11px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider cursor-pointer"
+                      id="btn-hard-reset-data"
+                    >
+                      Restaurer Démo
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Customer Lists view column */}
-          <div className="lg:col-span-2" id="right-table-body">
+          {/* Searching Filtering tools block */}
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 mx-auto w-full" id="filters-panel">
+            <div className="w-full sm:w-96 relative" id="search-input-field">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-500">
+                <Search className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                placeholder="Rechercher par nom de client..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-10 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 text-slate-100 placeholder-slate-650 transition-all font-medium text-base"
+                id="customer-search-textbox"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-550 hover:text-slate-300 cursor-pointer"
+                  id="btn-clear-search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between w-full sm:w-auto gap-4 text-sm font-semibold text-slate-400 bg-slate-950/40 px-4 py-2 rounded-xl border border-slate-800/40">
+              <span>
+                {searchQuery ? (
+                  <>
+                    Abonnés trouvés : <span className="text-slate-100 font-extrabold text-base">{filteredCustomers.length}</span> sur {customers.length}
+                  </>
+                ) : (
+                  <>
+                    Total abonnés : <span className="text-slate-100 font-extrabold text-base">{customers.length}</span>
+                  </>
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* Customer Lists view block */}
+          <div className="w-full" id="full-width-table-body">
             <CustomerTable
               customers={filteredCustomers}
               searchQuery={searchQuery}
@@ -530,11 +563,8 @@ export default function App() {
       </main>
 
       {/* Footer copyright */}
-      <footer className="text-center text-xs text-slate-400 py-10 border-t border-slate-200" id="main-site-footer">
-        <p>© 2026 - Gestion Clients, Compteurs d'Eau, Électricité & Codes Wi-Fi</p>
-        <p className="mt-1 text-[10px]">
-          Prêt pour déploiement sur Vercel avec persistance de données en temps réel Supabase
-        </p>
+      <footer className="text-center text-sm text-slate-500 py-10 border-t border-slate-850" id="main-site-footer">
+        <p>© 2026 - Service Clients. Tous droits réservés.</p>
       </footer>
     </div>
   );

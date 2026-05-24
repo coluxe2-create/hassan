@@ -22,36 +22,36 @@ export function DashboardStats({ customers }: StatsProps) {
       id: "stat-total-clients",
       title: "Total Clients",
       value: total,
-      icon: <User className="w-5 h-5 text-blue-600" id="icon-stat-user" />,
-      bg: "bg-blue-50 border-blue-100",
-      textColor: "text-blue-900",
-      subtitle: "Enregistrés localement",
+      icon: <User className="w-5 h-5 text-blue-400" id="icon-stat-user" />,
+      bg: "bg-blue-950/30 border-blue-800/40",
+      textColor: "text-blue-400",
+      subtitle: "Enregistrés dans la base",
     },
     {
       id: "stat-total-eau",
       title: "Compteurs d'Eau",
       value: countWater,
-      icon: <Droplets className="w-5 h-5 text-cyan-600" id="icon-stat-water" />,
-      bg: "bg-cyan-50 border-cyan-100",
-      textColor: "text-cyan-900",
+      icon: <Droplets className="w-5 h-5 text-cyan-400" id="icon-stat-water" />,
+      bg: "bg-cyan-950/30 border-cyan-800/40",
+      textColor: "text-cyan-400",
       subtitle: "Affectations actives",
     },
     {
       id: "stat-total-elec",
       title: "Compteurs Électricité",
       value: countElec,
-      icon: <Zap className="w-5 h-5 text-amber-500" id="icon-stat-elec" />,
-      bg: "bg-amber-50 border-amber-100",
-      textColor: "text-amber-900",
+      icon: <Zap className="w-5 h-5 text-amber-400" id="icon-stat-elec" />,
+      bg: "bg-amber-950/30 border-amber-800/40",
+      textColor: "text-amber-400",
       subtitle: "Raccordements suivis",
     },
     {
       id: "stat-total-wifi",
       title: "Modems Wi-Fi",
       value: countWifi,
-      icon: <Wifi className="w-5 h-5 text-indigo-600" id="icon-stat-wifi" />,
-      bg: "bg-indigo-50 border-indigo-100",
-      textColor: "text-indigo-900",
+      icon: <Wifi className="w-5 h-5 text-indigo-400" id="icon-stat-wifi" />,
+      bg: "bg-indigo-950/30 border-indigo-800/40",
+      textColor: "text-indigo-400",
       subtitle: "Passerelles configurées",
     },
   ];
@@ -59,24 +59,24 @@ export function DashboardStats({ customers }: StatsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboard-stats-grid">
       {stats.map((stat) => (
-        <div
-          key={stat.id}
-          id={stat.id}
-          className={`p-4 rounded-xl border ${stat.bg} shadow-xs transition-all duration-300 hover:shadow-md flex items-center justify-between`}
-        >
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              {stat.title}
-            </p>
-            <h4 id={`value-${stat.id}`} className={`text-2xl font-bold font-mono ${stat.textColor}`}>
-              {stat.value}
-            </h4>
-            <p className="text-[11px] text-slate-500 mt-0.5">{stat.subtitle}</p>
-          </div>
-          <div className="p-3 bg-white rounded-lg shadow-2xs border border-slate-105">
-            {stat.icon}
-          </div>
-        </div>
+         <div
+           key={stat.id}
+           id={stat.id}
+           className={`p-4 rounded-xl border ${stat.bg} shadow-md transition-all duration-300 hover:scale-[1.01] flex items-center justify-between`}
+         >
+           <div>
+             <p className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1">
+               {stat.title}
+             </p>
+             <h4 id={`value-${stat.id}`} className={`text-3xl font-extrabold font-mono ${stat.textColor}`}>
+               {stat.value}
+             </h4>
+             <p className="text-xs text-slate-400 mt-0.5">{stat.subtitle}</p>
+           </div>
+           <div className="p-3 bg-slate-950 rounded-lg shadow-2xs border border-slate-800">
+             {stat.icon}
+           </div>
+         </div>
       ))}
     </div>
   );
